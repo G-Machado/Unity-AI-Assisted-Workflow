@@ -1,4 +1,4 @@
-# unity-ai-ritual
+# Unity-AI-Assisted-Workflow
 
 > Structured AI-assisted development workflow for Unity projects.
 > Native Claude Code package — no extra tokens, no external runtime.
@@ -15,55 +15,57 @@ A Claude Code package that enforces a disciplined, step-by-step workflow for Uni
 
 ## Install
 
-Copy the `.claude/` folder and `CLAUDE.md` into your Unity project root:
+### Quick install (recommended)
+
+Clone this repo, then run the installer from your Unity project root. It auto-detects your Unity Editor path and generates `.mcp.json` for you — no manual configuration needed.
 
 ```bash
-# From this package directory
+# From your Unity project root
+bash /path/to/Unity-AI-Assisted-Workflow/install.sh
+```
+
+On Windows (Git Bash):
+```bash
+cd "C:/Users/you/Projects/MyUnityGame"
+bash "C:/path/to/Unity-AI-Assisted-Workflow/install.sh"
+```
+
+The script will:
+1. Validate you're in a Unity project
+2. Copy `.claude/` and `CLAUDE.md` into the project
+3. Auto-detect the Unity Editor executable (Windows, macOS, Linux)
+4. Generate `.mcp.json` with the correct paths
+5. Install `unity-mcp-server` via npm (if available)
+
+### Manual install
+
+```bash
 cp -r .claude/ /path/to/your/unity/project/
 cp CLAUDE.md /path/to/your/unity/project/
 cp .mcp.json /path/to/your/unity/project/   # then edit with your paths
 ```
 
-Or run the init command from inside your Unity project with Claude Code:
+### From inside Claude Code
 
+If `.claude/` is already in your project, run:
 ```
 /ritual-init
 ```
+
+This will auto-detect paths and fix any incomplete MCP config.
 
 ---
 
 ## Setup
 
-### 1. Configure MCP (optional but recommended)
-
-Edit `.mcp.json` at your project root:
-
-```json
-{
-  "mcpServers": {
-    "unity": {
-      "command": "npx",
-      "args": ["-y", "unity-mcp-server"],
-      "env": {
-        "UNITY_PROJECT_PATH": "/absolute/path/to/MyUnityProject",
-        "UNITY_EDITOR_PATH": "/Applications/Unity/Hub/Editor/2022.3.0f1/Unity.app/Contents/MacOS/Unity"
-      }
-    }
-  }
-}
-```
-
-Install the server:
-```bash
-npm install -g unity-mcp-server
-```
-
-### 2. Open Claude Code in your project root
+After running `install.sh`, everything should be configured automatically. Open Claude Code in your project root:
 
 ```bash
 cd /path/to/your/unity/project
 claude
 ```
+
+If you need to manually configure MCP, edit `.mcp.json` at your project root with the correct Unity paths. Install the MCP server with `npm install -g unity-mcp-server`.
 
 ---
 
@@ -120,7 +122,8 @@ Blocked at the `settings.json` permission level — Claude Code will refuse thes
 ## Package Structure
 
 ```
-unity-ai-ritual/
+Unity-AI-Assisted-Workflow/
+├── install.sh                         ← one-command installer (auto-detects Unity)
 ├── CLAUDE.md                          ← loaded every session, enforces the 7 laws
 ├── .mcp.json                          ← Unity MCP server config template
 └── .claude/
