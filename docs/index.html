@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unity-AI-Assisted-Workflow</title>
+  <style>
+    :root {
+      --bg: #0d0d0f;
+      --surface: #13131a;
+      --surface2: #1a1a24;
+      --border: #2a2a3a;
+      --accent: #7c6dfa;
+      --accent2: #a78bfa;
+      --green: #34d399;
+      --red: #f87171;
+      --yellow: #fbbf24;
+      --text: #e2e2ee;
+      --muted: #8888aa;
+      --code-bg: #0a0a12;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(13,13,15,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      height: 56px;
+    }
+    .nav-logo {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent2);
+    }
+    .nav-links { display: flex; gap: 1.5rem; }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    /* ── Layout ── */
+    .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 5rem 0 3.5rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(124,109,250,0.12);
+      color: var(--accent2);
+      border: 1px solid rgba(124,109,250,0.3);
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      margin-bottom: 1.5rem;
+    }
+    h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #e2e2ee 30%, var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-sub {
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 560px;
+      margin: 0 auto 2rem;
+    }
+    .hero-cta {
+      display: flex;
+      gap: .75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      padding: .55rem 1.3rem;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all .2s;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+    }
+    .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); }
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent2); }
+
+    /* ── Install strip ── */
+    .install-strip {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      padding: .75rem 1.25rem;
+      gap: 1rem;
+      margin: 2.5rem 0;
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      font-size: 13px;
+      overflow-x: auto;
+    }
+    .install-strip .prompt { color: var(--accent2); user-select: none; }
+    .install-strip .cmd { color: var(--text); flex: 1; white-space: nowrap; }
+    .copy-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+    .copy-btn:hover { color: var(--text); border-color: var(--accent); }
+    .copy-btn.copied { color: var(--green); border-color: var(--green); }
+
+    /* ── Sections ── */
+    section { padding: 4rem 0; border-bottom: 1px solid var(--border); }
+    section:last-child { border-bottom: none; }
+
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
+      color: var(--text);
+    }
+    h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: .5rem;
+      color: var(--text);
+    }
+    p { color: var(--muted); margin-bottom: 1rem; }
+
+    /* ── Workflow diagram ── */
+    .workflow {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      position: relative;
+    }
+    .workflow-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.25rem;
+      position: relative;
+    }
+    .step-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 44px;
+      flex-shrink: 0;
+    }
+    .step-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+      z-index: 1;
+    }
+    .step-line {
+      width: 2px;
+      flex: 1;
+      min-height: 28px;
+      background: var(--border);
+      margin: 2px 0;
+    }
+    .step-body {
+      padding-bottom: 1.75rem;
+      flex: 1;
+    }
+    .step-body h3 { margin-bottom: .2rem; }
+    .step-body p { margin: 0; font-size: 13.5px; }
+    .step-cmd {
+      display: inline-block;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 12px;
+      padding: 2px 8px;
+      color: var(--accent2);
+      margin-bottom: .35rem;
+    }
+    .stop-badge {
+      display: inline-block;
+      background: rgba(248,113,113,0.1);
+      color: var(--red);
+      border: 1px solid rgba(248,113,113,0.25);
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      padding: 1px 7px;
+      margin-left: 6px;
+      vertical-align: middle;
+      text-transform: uppercase;
+    }
+
+    /* ── Commands table ── */
+    .cmd-grid {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: .5rem 1.5rem;
+      align-items: baseline;
+    }
+    .cmd-name {
+      font-family: monospace;
+      font-size: 13px;
+      color: var(--accent2);
+      white-space: nowrap;
+    }
+    .cmd-desc { color: var(--muted); font-size: 13.5px; }
+
+    /* ── Pros / Cons ── */
+    .pro-con {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 620px) { .pro-con { grid-template-columns: 1fr; } }
+    .pro-con-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.25rem 1rem;
+    }
+    .pro-con-box h3 { font-size: .9rem; text-transform: uppercase; letter-spacing: .08em; margin-bottom: .9rem; }
+    .pro-con-box.pros h3 { color: var(--green); }
+    .pro-con-box.cons h3 { color: var(--yellow); }
+    .pro-con-box ul { list-style: none; display: flex; flex-direction: column; gap: .55rem; }
+    .pro-con-box li { font-size: 13.5px; color: var(--muted); display: flex; gap: .5rem; align-items: flex-start; }
+    .pro-con-box.pros li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+    .pro-con-box.cons li::before { content: '△'; color: var(--yellow); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+
+    /* ── Docs section ── */
+    .doc-files {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: .75rem;
+      margin-top: 1rem;
+    }
+    .doc-file {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+    .doc-file .fname {
+      font-family: monospace;
+      font-size: 12px;
+      color: var(--accent2);
+      margin-bottom: .4rem;
+    }
+    .doc-file .fdesc { font-size: 12.5px; color: var(--muted); margin: 0; }
+    .doc-file .fupdated { font-size: 11px; color: var(--border); margin-top: .4rem; }
+
+    /* ── Code blocks ── */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      overflow-x: auto;
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      font-size: 12.5px;
+      line-height: 1.6;
+      color: var(--text);
+      margin: .75rem 0;
+    }
+    code { font-family: inherit; }
+    .hl-cmd { color: var(--accent2); }
+    .hl-comment { color: var(--muted); }
+    .hl-str { color: var(--green); }
+
+    /* ── Steps list ── */
+    .steps { display: flex; flex-direction: column; gap: 1rem; }
+    .step-row {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+    .step-num {
+      background: rgba(124,109,250,0.15);
+      color: var(--accent2);
+      border: 1px solid rgba(124,109,250,0.25);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .step-content h3 { margin-bottom: .2rem; font-size: .95rem; }
+    .step-content p { margin: 0; font-size: 13.5px; }
+
+    /* ── Laws ── */
+    .laws { display: flex; flex-direction: column; gap: .6rem; counter-reset: law; }
+    .law {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      padding: .75rem 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      counter-increment: law;
+    }
+    .law::before {
+      content: counter(law);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      background: rgba(124,109,250,0.12);
+      border-radius: 4px;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .law span { font-size: 13.5px; color: var(--muted); }
+
+    /* ── Footer ── */
+    footer {
+      padding: 2.5rem 0;
+      text-align: center;
+      color: var(--muted);
+      font-size: 12.5px;
+      border-top: 1px solid var(--border);
+    }
+    footer a { color: var(--accent2); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<!-- ── Nav ── -->
+<nav>
+  <span class="nav-logo">Unity · AI · Workflow</span>
+  <div class="nav-links">
+    <a href="#workflow">Workflow</a>
+    <a href="#install">Install</a>
+    <a href="#docs">Docs</a>
+    <a href="#commands">Commands</a>
+    <a href="#tradeoffs">Trade-offs</a>
+  </div>
+</nav>
+
+<!-- ── Hero ── -->
+<div class="container">
+  <div class="hero">
+    <div class="hero-badge">Claude Code · Unity · Native</div>
+    <h1>Disciplined AI-assisted<br>Unity development</h1>
+    <p class="hero-sub">
+      A Claude Code workflow package that keeps you in control. Structured rituals,
+      living documentation, and hard guardrails — no autonomous commits, no surprise pushes.
+    </p>
+    <div class="hero-cta">
+      <a href="#install" class="btn btn-primary">Get started →</a>
+      <a href="https://github.com/G-Machado/Unity-AI-Assisted-Workflow" class="btn btn-outline" target="_blank">View on GitHub</a>
+    </div>
+
+    <div class="install-strip">
+      <span class="prompt">$</span>
+      <span class="cmd" id="install-cmd">bash &lt;(curl -fsSL https://raw.githubusercontent.com/G-Machado/Unity-AI-Assisted-Workflow/main/install.sh)</span>
+      <button class="copy-btn" onclick="copyInstall()">Copy</button>
+    </div>
+  </div>
+
+  <!-- ── Workflow ── -->
+  <section id="workflow">
+    <h2>The ritual</h2>
+    <p>Every task follows the same sequence — no shortcuts, no skipped steps.</p>
+
+    <div class="workflow">
+
+      <div class="workflow-step">
+        <div class="step-left">
+          <div class="step-icon" style="background:rgba(124,109,250,.12);">🔍</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-body">
+          <div class="step-cmd">/investigate &lt;task&gt;</div>
+          <h3>Investigate</h3>
+          <p>Loads project docs for context. Root cause analysis, affected files, 3 approaches proposed. No code written.</p>
+        </div>
+      </div>
+
+      <div class="workflow-step">
+        <div class="step-left">
+          <div class="step-icon" style="background:rgba(167,139,250,.1);">✅</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-body">
+          <h3>You approve one approach</h3>
+          <p>Choose Quick Fix, Optimal Fix, or Balanced Fix. Claude waits — nothing happens without your explicit sign-off.</p>
+        </div>
+      </div>
+
+      <div class="workflow-step">
+        <div class="step-left">
+          <div class="step-icon" style="background:rgba(52,211,153,.1);">⚙️</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-body">
+          <div class="step-cmd">/implement</div>
+          <h3>Implement <span class="stop-badge">stop after</span></h3>
+          <p>Branch created (with your confirmation). Minimum necessary changes. Self-review checklist. Stops before commit.</p>
+        </div>
+      </div>
+
+      <div class="workflow-step">
+        <div class="step-left">
+          <div class="step-icon" style="background:rgba(251,191,36,.1);">🧪</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-body">
+          <div class="step-cmd">/validate</div>
+          <h3>Validate in Unity Editor <span class="stop-badge">manual</span></h3>
+          <p>You open the Editor. Claude guides compilation check, Play Mode testing, MCP inspection. Routes to fix-error on failure.</p>
+        </div>
+      </div>
+
+      <div class="workflow-step">
+        <div class="step-left">
+          <div class="step-icon" style="background:rgba(248,113,113,.1);">🔧</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-body">
+          <div class="step-cmd">/fix-error &lt;error&gt;</div>
+          <h3>Fix errors (if any)</h3>
+          <p>Checks ERRORS.md for known solutions first. Classifies error, proposes 3 fixes, logs the resolution for next time.</p>
+        </div>
+      </div>
+
+      <div class="workflow-step">
+        <div class="step-left">
+          <div class="step-icon" style="background:rgba(52,211,153,.12);">📦</div>
+        </div>
+        <div class="step-body">
+          <div class="step-cmd">/commit</div>
+          <h3>Commit + update docs <span class="stop-badge">no push</span></h3>
+          <p>Logical atomic commits, Conventional Commits format, plan shown before execution. Updates project docs automatically. You push manually.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Install ── -->
+  <section id="install">
+    <h2>Installation</h2>
+    <p>Run this from your Unity project root. Works on Windows (Git Bash), macOS, and Linux.</p>
+
+    <div class="steps">
+      <div class="step-row">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Run the one-liner from your Unity project root</h3>
+          <pre><span class="hl-comment"># cd into your Unity project first</span>
+<span class="hl-cmd">cd</span> <span class="hl-str">"C:/Users/you/Projects/MyGame"</span>
+
+<span class="hl-cmd">bash</span> &lt;(curl -fsSL https://raw.githubusercontent.com/G-Machado/Unity-AI-Assisted-Workflow/main/install.sh)</pre>
+          <p>The script validates your Unity project, downloads the package, auto-detects your Unity Editor path, and generates <code>.mcp.json</code>.</p>
+        </div>
+      </div>
+
+      <div class="step-row">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>Open Claude Code in the project</h3>
+          <pre><span class="hl-cmd">claude</span></pre>
+          <p>Uses your Pro or Max subscription — no API key needed. Just log in with your claude.ai account.</p>
+        </div>
+      </div>
+
+      <div class="step-row">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>Bootstrap project documentation</h3>
+          <pre><span class="hl-cmd">/doc-init</span></pre>
+          <p>Scans your existing scripts and generates the docs layer. One-time setup — updates automatically after that.</p>
+        </div>
+      </div>
+
+      <div class="step-row">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h3>Start your first task</h3>
+          <pre><span class="hl-cmd">/investigate</span> add double-jump to the player controller</pre>
+        </div>
+      </div>
+    </div>
+
+    <p style="margin-top:1.5rem;font-size:13px;">
+      <strong style="color:var(--text)">Requirements:</strong> Claude Code CLI, Unity 2021.3+, Node.js (for unity-mcp-server). Git Bash on Windows.
+    </p>
+  </section>
+
+  <!-- ── Docs system ── -->
+  <section id="docs">
+    <h2>Living documentation</h2>
+    <p>Four compact files in <code>.claude/docs/</code> — structured data, never prose.
+    Auto-updated by the workflow so Claude always has full context without wasting tokens re-discovering the project.</p>
+
+    <div class="doc-files">
+      <div class="doc-file">
+        <div class="fname">PROJECT.md</div>
+        <p class="fdesc">Current branch, open work, known issues, next planned task.</p>
+        <div class="fupdated">Updated by → /commit</div>
+      </div>
+      <div class="doc-file">
+        <div class="fname">SYSTEMS.md</div>
+        <p class="fdesc">All scripts ever touched: path, type, dependencies, serialized fields.</p>
+        <div class="fupdated">Updated by → /commit</div>
+      </div>
+      <div class="doc-file">
+        <div class="fname">DECISIONS.md</div>
+        <p class="fdesc">Why X was chosen over Y — prevents re-litigating architecture in every session.</p>
+        <div class="fupdated">Updated by → /commit</div>
+      </div>
+      <div class="doc-file">
+        <div class="fname">ERRORS.md</div>
+        <p class="fdesc">Every error resolved, with root cause and fix. Checked before new analysis begins.</p>
+        <div class="fupdated">Updated by → /fix-error</div>
+      </div>
+    </div>
+
+    <pre style="margin-top:1.5rem;"><span class="hl-comment"># PROJECT.md — example</span>
+updated: 2025-04-12 | branch: feature/double-jump | status: wip
+
+## Active Work
+implement double-jump mechanic for PlayerController
+
+## Systems
+PlayerController — movement + jump logic — Assets/Scripts/Player/PlayerController.cs
+GameEvents — ScriptableObject event bus — Assets/Scripts/Events/GameEvents.cs
+
+## Open Issues
+none
+
+## Next
+add coyote time to jump window</pre>
+  </section>
+
+  <!-- ── Commands ── -->
+  <section id="commands">
+    <h2>Commands</h2>
+    <div class="cmd-grid">
+      <span class="cmd-name">/investigate &lt;task&gt;</span>
+      <span class="cmd-desc">Root cause analysis, 3 approaches, no code written. Reads docs for context.</span>
+
+      <span class="cmd-name">/implement</span>
+      <span class="cmd-desc">Branch + minimum changes after approved approach. Stops before commit.</span>
+
+      <span class="cmd-name">/validate [error]</span>
+      <span class="cmd-desc">Guide Unity Editor validation. Routes to fix-error or commit on result.</span>
+
+      <span class="cmd-name">/fix-error &lt;error&gt;</span>
+      <span class="cmd-desc">Classify, propose 3 fixes, check ERRORS.md for known solutions. Logs resolution.</span>
+
+      <span class="cmd-name">/commit</span>
+      <span class="cmd-desc">Atomic commits with plan approval. Updates docs automatically. Never pushes.</span>
+
+      <span class="cmd-name">/doc-init</span>
+      <span class="cmd-desc">Scan project and generate .claude/docs/ from scratch.</span>
+
+      <span class="cmd-name">/doc-update</span>
+      <span class="cmd-desc">Manually refresh docs after an out-of-band change.</span>
+
+      <span class="cmd-name">/ritual-init</span>
+      <span class="cmd-desc">Bootstrap .claude/ and .mcp.json for a new project (for manual installs).</span>
+    </div>
+  </section>
+
+  <!-- ── Pros / Cons ── -->
+  <section id="tradeoffs">
+    <h2>Trade-offs</h2>
+    <p>This package is opinionated by design. Know what you're getting.</p>
+
+    <div class="pro-con">
+      <div class="pro-con-box pros">
+        <h3>Strengths</h3>
+        <ul>
+          <li>You stay in control — Claude proposes, you decide</li>
+          <li>No surprise commits, no autonomous pushes — ever</li>
+          <li>Docs auto-update so context never degrades between sessions</li>
+          <li>Known errors are remembered — same mistake never analyzed twice</li>
+          <li>Past decisions are logged — Claude won't re-argue settled choices</li>
+          <li>Zero dependencies — pure Claude Code primitives, no runtime</li>
+          <li>Works with your existing subscription — no extra API cost</li>
+          <li>One command installs into any Unity project on any machine</li>
+        </ul>
+      </div>
+      <div class="pro-con-box cons">
+        <h3>Constraints</h3>
+        <ul>
+          <li>Slower than letting AI act autonomously — every step requires approval</li>
+          <li>Unity MCP inspection requires npm and a running Editor instance</li>
+          <li>Git Bash required on Windows (native CMD not supported)</li>
+          <li>Docs must be initialized manually with /doc-init on first use</li>
+          <li>Does not auto-run tests — manual Play Mode validation is required</li>
+          <li>Subagents (investigator, implementer, validator) count toward usage</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 7 Laws ── -->
+  <section>
+    <h2>The 7 laws</h2>
+    <p>Loaded every session via <code>CLAUDE.md</code>. Non-negotiable.</p>
+    <div class="laws">
+      <div class="law"><span>Investigate before implementing</span></div>
+      <div class="law"><span>No branch without explicit approval</span></div>
+      <div class="law"><span>Never push automatically</span></div>
+      <div class="law"><span>Never create PRs automatically</span></div>
+      <div class="law"><span>Stop before Unity validation</span></div>
+      <div class="law"><span>Manual validation required — Play Mode cannot be skipped</span></div>
+      <div class="law"><span>Propose 3 alternatives before taking any action</span></div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ── Footer ── -->
+<footer>
+  <div class="container">
+    <a href="https://github.com/G-Machado/Unity-AI-Assisted-Workflow" target="_blank">GitHub</a>
+    &nbsp;·&nbsp;
+    Built with <a href="https://docs.anthropic.com/en/docs/claude-code/overview" target="_blank">Claude Code</a>
+    &nbsp;·&nbsp;
+    <span>Unity 2021.3+</span>
+  </div>
+</footer>
+
+<script>
+  function copyInstall() {
+    const cmd = 'bash <(curl -fsSL https://raw.githubusercontent.com/G-Machado/Unity-AI-Assisted-Workflow/main/install.sh)';
+    navigator.clipboard.writeText(cmd).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+</script>
+
+</body>
+</html>
