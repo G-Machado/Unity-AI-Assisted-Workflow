@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "unity": {
+      "command": "npx",
+      "args": ["-y", "unity-mcp-server"],
+      "env": {
+        "UNITY_PROJECT_PATH": "REPLACE_WITH_ABSOLUTE_PATH_TO_YOUR_UNITY_PROJECT",
+        "UNITY_EDITOR_PATH": "REPLACE_WITH_ABSOLUTE_PATH_TO_UNITY_EDITOR_EXECUTABLE"
+      }
+    }
+  }
+}
